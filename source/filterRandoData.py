@@ -13,7 +13,7 @@ linker_index = 2
 promLinkerLen_index = 5
 
 
-def extractPromoters(chr, chr_string):
+def extractPromoters(chromo, chr_string):
     """ parse saccharomyces_cerevisiae_chrxx.gff and extract promoters """
 
     fin = open('saccharomyces_cerevisiae_' + chr_string + '.gff')
@@ -48,7 +48,7 @@ def extractPromoters(chr, chr_string):
                 promStart = int(end)
                 promEnd = int(end) + promLength
 
-            promoter = chr[max(promStart, 0):promEnd]
+            promoter = chromo[max(promStart, 0):promEnd]
             features += [(standardGeneName, systematicGeneName,
                           classification, promStart, promEnd, promoter)]
         line = fin.readline()
