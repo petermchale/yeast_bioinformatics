@@ -29,7 +29,6 @@ def getFasta(fh):
 
 def createEnergyMatrix():
     """ compute the energy matrix for Gal4 using its published affinity data """
-    
 
     siteLen = 17
     halfSiteLen = 8

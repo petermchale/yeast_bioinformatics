@@ -13,10 +13,10 @@ linker_index = 2
 promLinkerLen_index = 5
 
 
-def extractPromotersFromChr03():
-    """ parse saccharomyces_cerevisiae_chr03.gff and extract promoters """
+def extractPromoters(chr, chr_string):
+    """ parse saccharomyces_cerevisiae_chrxx.gff and extract promoters """
 
-    fin = open('saccharomyces_cerevisiae_chr03.gff')
+    fin = open('saccharomyces_cerevisiae_' + chr_string + '.gff')
 
     line = fin.readline()
     while line[0] == "#":
@@ -48,7 +48,7 @@ def extractPromotersFromChr03():
                 promStart = int(end)
                 promEnd = int(end) + promLength
 
-            promoter = chr03[max(promStart, 0):promEnd]
+            promoter = chr[max(promStart, 0):promEnd]
             features += [(standardGeneName, systematicGeneName,
                           classification, promStart, promEnd, promoter)]
         line = fin.readline()
@@ -76,66 +76,70 @@ def extractLinkers():
 
     return features
 
-###########################################################################
 
-linkerFeatures = extractLinkers()
+def filterRandoData():
 
-linkerLengthList = []
-maxLinkerLength = -1
-for linkerFeature in linkerFeatures:
-    (linkerStart, linkerEnd, linker) = linkerFeature
-    linkerLengthList += [len(linker)]
-    if len(linker) > maxLinkerLength:
-        maxLinkerLength = len(linker)
-print 'max linker length =', maxLinkerLength
-print 'max length on histogram =', xMax
-outFileName = 'allLinkerLengths.dat'
-fh = open(outFileName, 'w')
-for length in linkerLengthList:
-    fh.write(str(length) + '\n')
-fh.close()
+    linkerFeatures = extractLinkers()
 
-binnedLinkerLengthList = binList(linkerLengthList, 0, xMax, binLength)
-outFileName = 'binnedLinkerLength.dat'
-fh = open(outFileName, 'w')
-for tuple_ in binnedLinkerLengthList:
-    myStr = tabListTuple(tuple_)
-    fh.write(myStr + '\n')
-fh.close()
+    linkerLengthList = []
+    maxLinkerLength = -1
+    for linkerFeature in linkerFeatures:
+        (linkerStart, linkerEnd, linker) = linkerFeature
+        linkerLengthList += [len(linker)]
+        if len(linker) > maxLinkerLength:
+            maxLinkerLength = len(linker)
+    print('max linker length =', maxLinkerLength)
+    print('max length on histogram =', xMax)
+    outFileName = 'allLinkerLengths.dat'
+    fh = open(outFileName, 'w')
+    for length in linkerLengthList:
+        fh.write(str(length) + '\n')
+    fh.close()
 
-fg = open('chr03.fsa')
-[header, chr03] = getFasta(fg)
-fg.close()
-print "chr03 length =", len(chr03)
+    binnedLinkerLengthList = binList(linkerLengthList, 0, xMax, binLength)
+    outFileName = 'binnedLinkerLength.dat'
+    fh = open(outFileName, 'w')
+    for tuple_ in binnedLinkerLengthList:
+        myStr = tabListTuple(tuple_)
+        fh.write(myStr + '\n')
+    fh.close()
 
-promoterFeatures = extractPromotersFromChr03()
+    fg = open('chr03.fsa')
+    (header, chr03) = getFasta(fg)
+    fg.close()
+    print("chr03 length =", len(chr03))
 
-promoterLinkers = []
-for linkerFeature in linkerFeatures:
-    (linkerStart, linkerEnd, linker) = linkerFeature
-    if len(linker) > cutOffLinkerLength:
-        for promoterFeature in promoterFeatures:
-            (standardGeneName, systematicGeneName,
-             classification, promStart, promEnd, promoter) \
-                = promoterFeature
-            if (promStart < linkerStart) and (linkerEnd < promEnd):
-                promoterLinker = (systematicGeneName, classification,
-                                  linkerStart, linkerEnd, linker,
-                                  len(linker))
-                promoterLinkers += [promoterLinker]
-                break
+    promoterFeatures = extractPromoters(chr03, 'chr03')
 
-print "# promoter linkers =", len(promoterLinkers)
+    promoterLinkers = []
+    for linkerFeature in linkerFeatures:
+        (linkerStart, linkerEnd, linker) = linkerFeature
+        if len(linker) > cutOffLinkerLength:
+            for promoterFeature in promoterFeatures:
+                (standardGeneName, systematicGeneName,
+                 classification, promStart, promEnd, promoter) \
+                    = promoterFeature
+                if (promStart < linkerStart) and (linkerEnd < promEnd):
+                    promoterLinker = (systematicGeneName, classification,
+                                      linkerStart, linkerEnd, linker,
+                                      len(linker))
+                    promoterLinkers += [promoterLinker]
+                    break
 
-fileName = 'promoterLinkersFromRando.tab'
-fout = open(fileName, 'w')
-fileName = 'promoterLinkerLengths.dat'
-fout2 = open(fileName, 'w')
-for promoterLinker in promoterLinkers:
-    tabbedStr = tabListTuple(promoterLinker)
-    fout.write(tabbedStr + '\n')
-    length = promoterLinker[promLinkerLen_index]
-    fout2.write(str(length) + '\n')
-fout.close()
-fout2.close()
+    print("# promoter linkers =", len(promoterLinkers))
 
+    fileName = 'promoterLinkersFromRando.tab'
+    fout = open(fileName, 'w')
+    fileName = 'promoterLinkerLengths.dat'
+    fout2 = open(fileName, 'w')
+    for promoterLinker in promoterLinkers:
+        tabbedStr = tabListTuple(promoterLinker)
+        fout.write(tabbedStr + '\n')
+        length = promoterLinker[promLinkerLen_index]
+        fout2.write(str(length) + '\n')
+    fout.close()
+    fout2.close()
+
+if __name__ == '__main__':
+
+    filterRandoData()
