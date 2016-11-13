@@ -27,7 +27,7 @@ def getFasta(fh):
     return [header[:-1], seq]
 
 
-def createEnergyMatrix():
+def createEnergyMatrix(input_filename):
     """ compute the energy matrix for Gal4 using its published affinity data """
 
     siteLen = 17
@@ -37,7 +37,7 @@ def createEnergyMatrix():
     for pos in range(siteLen):
         matrix += [{'A': 0.0, 'C': 0.0, 'G': 0.0, 'T': 0.0}]
 
-    fin = open('Gal4_affinity.in')
+    fin = open(input_filename)
     lines = fin.readlines()
     count = 0
     for line in lines:
@@ -67,11 +67,4 @@ def createEnergyMatrix():
         for bp in 'ACGT':
             matrix[pos][bp] -= minEnergy
             
-    fout = open('Gal4_energy.dat', 'w')
-    for pos in range(siteLen):
-        for bp in 'ACGT':
-            fout.write('%.3f\t' % matrix[pos][bp])
-        fout.write('\n')
-    fout.close()
-    
-    return matrix 
+    return matrix

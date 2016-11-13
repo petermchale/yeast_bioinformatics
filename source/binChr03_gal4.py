@@ -5,7 +5,7 @@ E_MIN = -5.0
 E_MAX = 50.0
 ENERGY_BIN_WIDTH = 0.25
 
-matrix = createEnergyMatrix()
+matrix = createEnergyMatrix('data/Gal4_affinity.in')
 binSizeStr = str(ENERGY_BIN_WIDTH)
 
 print("evaluating energy list ...")
