@@ -1,5 +1,6 @@
 from math import floor
 import sys
+import pandas as pd
 
 
 def calcSiteEnergyWithMatrix(seq, matrix):
@@ -25,12 +26,13 @@ def calcEnergyListWithMatrix(dna, matrix):
         sys.exit(-1)
         
     energyList = []
-    for pos in range(len(dna)-siteLen+1):
-        seq = dna[pos:pos+siteLen]
+    for start in range(len(dna)-siteLen+1):
+        end = start + siteLen
+        seq = dna[start:end]
         seqEnergy = calcSiteEnergyWithMatrix(seq, matrix)
-        energyList += [seqEnergy]
+        energyList += [(seqEnergy, start, end)]
 
-    return energyList
+    return pd.DataFrame(data=energyList, columns=['TF-DNA binding energy', 'binding-site start position', 'binding-site end position'])
 
 
 def calc_bin(num, binWidth):
