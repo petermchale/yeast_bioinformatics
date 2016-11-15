@@ -58,10 +58,5 @@ def binList(xList, xMin, xMax, binWidth):
         xBin, xFreq = binnedxList[binNum]
         binnedxList[binNum] = xBin, xFreq+1
 
-    return binnedxList
+    return [t[0] for t in binnedxList], [t[1] for t in binnedxList]
 
-
-def tabListTuple(mixedListTuple):
-    """ create tab-delimited string from a list/tuple """
-
-    return "\t".join([str(item) for item in mixedListTuple]) 
